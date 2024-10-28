@@ -6,6 +6,9 @@ __pycache__
 dist
 *.egg-info
 
+# Pytest
+.pytest_cache
+
 # Pip
 build
 
