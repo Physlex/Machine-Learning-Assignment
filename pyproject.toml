@@ -2,6 +2,7 @@
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
+
 [project]
 name="CMPUT-466-Assignment"
 version="0.0.1"
@@ -9,3 +10,11 @@ dynamic = ["dependencies"]
 
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
+
+
+[tool.pytest.ini_options]
+minversion = 6.0
+pythonpath = "src"
+testpaths  = [
+    "__tests__",
+]
