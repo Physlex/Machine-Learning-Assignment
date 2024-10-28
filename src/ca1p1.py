@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
+
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 
-def rotate(data, degree):
-    # data: M x 2
-    theta = np.pi/180 * degree
-    R = np.array([[np.cos(theta), -np.sin(theta)],
-                  [np.sin(theta), np.cos(theta)]])  # rotation matrix
-    return np.dot(data, R.T)
+#### TODO ################################################################################
+
 
 def leastSquares(X, Y):
     # In this function, X is always the input, Y is always the output
@@ -24,10 +22,21 @@ def leastSquares(X, Y):
 
 def model(X, w):
     # X: M x (d+1)
-    # w: d+1
+    # w: d+1 x 1
     # return y_hat: M x 1
 
-    return np.multiply(X, w)
+    return np.matmul(X, w)
+
+
+#### IMPLEMENTED #########################################################################
+
+
+def rotate(data, degree):
+    # data: M x 2
+    theta = np.pi/180 * degree
+    R = np.array([[np.cos(theta), -np.sin(theta)],
+                  [np.sin(theta), np.cos(theta)]])  # rotation matrix
+    return np.dot(data, R.T)
 
 def generate_data(M, var1, var2, degree):
 
@@ -76,9 +85,10 @@ def generate_data(M, var1, var2, degree):
     plt.savefig('data_xy_'+str(var2) + '_' + str(degree) + '.jpg')
     return data
 
-###########################
-# Main code starts here
-###########################
+
+#### MAIN CODE STARTS HERE ###############################################################
+
+
 if __name__ == "__main__": # TODO: Remove before handing in
     # Settings
     M = 5000
