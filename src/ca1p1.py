@@ -10,7 +10,6 @@ def rotate(data, degree):
                   [np.sin(theta), np.cos(theta)]])  # rotation matrix
     return np.dot(data, R.T)
 
-
 def leastSquares(X, Y):
     # In this function, X is always the input, Y is always the output
     # X: M x (d+1), Y: M x 1, where d=1 here
@@ -21,7 +20,6 @@ def leastSquares(X, Y):
 
     return w
 
-
 def model(X, w):
     # X: M x (d+1)
     # w: d+1
@@ -30,7 +28,6 @@ def model(X, w):
     # TODO: YOUR CODE HERE
 
     return y_hat
-
 
 def generate_data(M, var1, var2, degree):
 
@@ -79,7 +76,6 @@ def generate_data(M, var1, var2, degree):
     plt.savefig('data_xy_'+str(var2) + '_' + str(degree) + '.jpg')
     return data
 
-
 ###########################
 # Main code starts here
 ###########################
@@ -97,7 +93,6 @@ Input = data[:, 0].reshape((-1, 1))  # M x d, where d=1
 # M x (d+1) augmented feature
 Input_aug = np.concatenate([Input, np.ones([M, 1])], axis=1)
 Output = data[:, 1].reshape((-1, 1))  # M x 1
-
 
 w_x2y = leastSquares(Input_aug, Output)  # (d+1) x 1, where d=1
 
