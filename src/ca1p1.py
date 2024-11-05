@@ -5,18 +5,23 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-#### TODO ################################################################################
+#### FOR STUDENT #########################################################################
 
 
 def leastSquares(X, Y):
+    """
+    The solution for the optimal weights (ignoring constants) is ( X^{T}X )^{-1}(X^TY)
+
+    So this just implements that.
+    """
+
     # In this function, X is always the input, Y is always the output
     # X: M x (d+1), Y: M x 1, where d=1 here
     # return weights w
 
-    # TODO: YOUR CODE HERE
-    # closed form solution by matrix-vector representations only
-
-    w=[]
+    first_part = np.linalg.inv(np.dot(X.T, X))
+    secnd_part = np.dot(X.T, Y)
+    w = np.dot(first_part, secnd_part)
 
     return w
 
@@ -25,7 +30,7 @@ def model(X, w):
     # w: d+1 x 1
     # return y_hat: M x 1
 
-    return np.matmul(X, w)
+    return np.dot(X, w)
 
 
 #### IMPLEMENTED #########################################################################
@@ -93,8 +98,8 @@ if __name__ == "__main__": # TODO: Remove before handing in
     # Settings
     M = 5000
     var1 = 1
-    var2 = 0.8
-    degree = 45
+    var2 = 0.1
+    degree = 90
 
     data = generate_data(M, var1, var2, degree)
 
