@@ -9,6 +9,7 @@ from pathlib import Path
 from copy import deepcopy
 
 import pickle as pickle
+import matplotlib.pyplot as plt
 import numpy as np
 
 
@@ -59,14 +60,12 @@ def train(X_train, y_train, X_val, y_val):
     #### INITIALIZATION ####
 
     n_train = X_train.shape[0]
-    n_val = X_val.shape[0]
 
     # w: (d+1)x1
     w = np.zeros([X_train.shape[1], 1])
 
     losses_train = []
     risks_val = []
-    weights = []
     best_validation_epoch = float('inf')
 
     w_best = None
@@ -115,9 +114,8 @@ def train(X_train, y_train, X_val, y_val):
         # Monitor model behaviour after each epoch
         risks_val.append(val_risk)
         losses_train.append(curr_loss)
-        weights.append(w)
 
-    return best_validation_epoch, val_risk, w_best
+    return (best_validation_epoch, val_risk, w_best, losses_train, risks_val) 
 
 ### MAIN #################################################################################
 
@@ -134,8 +132,6 @@ if __name__ == "__main__":
     except (OSError):
         print(f"File {pkl_path} cannot be discovered. Have you entered the correct path?")
         raise OSError
-    finally:
-        print(f"File {pkl_path} loaded successfully")
 
     assert X is not None and y is not None, f"Failed to initialize X, y"
 
@@ -179,7 +175,14 @@ if __name__ == "__main__":
 
     #### Perform test using the weights yielding the best test performance ####
 
-    best_val_epoch, best_risk, w_best = train(X_train, y_train, X_val, y_val)
+    (
+        best_val_epoch,
+        best_risk,
+        w_best,
+        training_loss,
+        validation_risk
+    ) = train(X_train, y_train, X_val, y_val)
+
     prediction, loss, risk = predict(X_test, w_best, y_test)
 
 
@@ -198,5 +201,21 @@ if __name__ == "__main__":
     print("")
 
     #### Draw plots ####
+
+    fig, (axis_1, axis_2) = plt.subplots(1, 2)
+
+    # Plot training loss on the first subplot
+    axis_1.plot(range(len(training_loss)), training_loss, label='Training Loss', color='blue', marker='o')
+    axis_1.set_title('Training Loss')
+    axis_1.set_ylabel('Training Loss')
+    axis_1.set_xlabel('Epochs')
+
+    # Plot validation risk on the second subplot
+    axis_2.plot(range(len(validation_risk)), validation_risk, label='Validation Risk', color='red', marker='x')
+    axis_2.set_title('Validation Risk')
+    axis_2.set_ylabel('Validation Risk')
+    axis_2.set_xlabel('Epochs')
+
+    plt.savefig('output/ca2pa2.png')  # Save the plot as an image
 
     pass
