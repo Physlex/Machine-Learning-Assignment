@@ -67,24 +67,23 @@ def train(X_train, y_train, X_val, y_val):
     losses_train = []
     risks_val = []
     weights = []
+    best_validation_epoch = float('inf')
 
     w_best = None
     risk_best = float('inf')
     loss_best = float('inf')
 
-    for _ in range(MAX_ITERS):
+    for epoch in range(MAX_ITERS):
 
         loss_this_epoch = 0
-        risk_this_epoch = 0
         M = 1
         for b in range(int(np.ceil(n_train/BATCH_SIZE))):
 
             X_batch = X_train[b*BATCH_SIZE : (b+1)*BATCH_SIZE]
             y_batch = y_train[b*BATCH_SIZE : (b+1)*BATCH_SIZE]
 
-            y_hat_batch, loss_batch, risk_batch = predict(X_batch, w, y_batch)
+            y_hat_batch, loss_batch, _ = predict(X_batch, w, y_batch)
             loss_this_epoch += loss_batch
-            risk_this_epoch += risk_batch
 
             #### Mini-Batch Gradient Descent ####
 
@@ -102,23 +101,23 @@ def train(X_train, y_train, X_val, y_val):
         # 3. Keep track of the best validation epoch, risk, and the weights
 
         # Keep track of the best validation epoch and (1.)
-        curr_loss = loss_this_epoch / M
+        curr_loss = loss_this_epoch / int(np.ceil(n_train/BATCH_SIZE))
         loss_best = min(loss_best, curr_loss)
 
         # Keep track of the best risk and (2.)
-        curr_risk = risk_this_epoch
-        risk_best = min(risk_best, curr_risk)
-        if (risk_best == curr_risk):
-            # Keep track of the best weights
+        _, val_loss, val_risk = predict(X_val, w, y_val)
+        if (risk_best >= val_risk):
+            # Keep track of the best weights and associated best risk
+            risk_best = val_risk
             w_best = deepcopy(w)
+            best_validation_epoch = epoch
 
         # Monitor model behaviour after each epoch
-        risks_val.append(curr_risk)
+        risks_val.append(val_risk)
         losses_train.append(curr_loss)
         weights.append(w)
 
-    return (w_best, risk_best, loss_best), (risks_val, losses_train, weights)
-
+    return best_validation_epoch, val_risk, w_best
 
 ### MAIN #################################################################################
 
@@ -126,7 +125,7 @@ if __name__ == "__main__":
 
     #### LOAD DATA ####
 
-    pkl_path = Path.cwd() / "public" / "housing.pkl"
+    pkl_path = Path.cwd() / "src" / "public" / "housing.pkl"
     X = None
     y = None
     try:
@@ -156,8 +155,6 @@ if __name__ == "__main__":
 
     # X_: Nsample x (d+1)
     X_ = np.concatenate((np.ones([X.shape[0], 1]), X), axis=1)
-    
-    # print(X.shape, y.shape) # It's always helpful to print the shape of a variable
 
 
     #### SAMPLE FROM TRAINING SET ####
@@ -180,13 +177,26 @@ if __name__ == "__main__":
 
     #### TRAINING ####
 
-    (bests, monitor) = train(X_train, y_train, X_val, y_val)
+    #### Perform test using the weights yielding the best test performance ####
+
+    best_val_epoch, best_risk, w_best = train(X_train, y_train, X_val, y_val)
+    prediction, loss, risk = predict(X_test, w_best, y_test)
 
 
-    #### Perform test by the weights yielding the best validation performance ####
+    #### Report numbers ####
 
+    print("### DATA STATISTICS #########################################################")
+    print("Target mean", mean_y)
+    print("Target std", std_y)
+    print("")
 
-    #### Report numbers and draw plots as required ####
+    print("### TESTING PERFORMANCE #####################################################")
+    print("Best validation epoch: ", best_val_epoch)
+    print("Best validation risk: ", best_risk)
+    print("Test Loss: ", loss)
+    print("Test Risk: ", risk)
+    print("")
 
+    #### Draw plots ####
 
     pass
